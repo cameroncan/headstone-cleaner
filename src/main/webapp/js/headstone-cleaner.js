@@ -1,4 +1,4 @@
-var hiModule = angular.module('headstone-indexer', []);
+var hiModule = angular.module('headstone-cleaner', []);
 
 hiModule.directive('headstoneIndexer', ['$http', function($http){
 	return {
@@ -29,7 +29,7 @@ hiModule.directive('headstoneIndexer', ['$http', function($http){
 			{
 				document.getElementById("submitButton").disabled = true;
 //				$("#submitButton").prop( "disabled", true );
-				$http.post('/headstone-indexer/rest/binarize', scope.result.inputImage).
+				$http.post('/headstone-cleaner/rest/binarize', scope.result.inputImage).
 			    success(function(result, status, headers, config) {
 //			    	scope.result.outputImageNormal = result.binarizedNormalPath;
 //			    	scope.result.outputImageInverse = results.binarizedInvertedPath;

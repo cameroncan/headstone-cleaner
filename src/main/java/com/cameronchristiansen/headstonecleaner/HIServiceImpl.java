@@ -1,4 +1,4 @@
-package com.cameronchristiansen.headstoneindexer;
+package com.cameronchristiansen.headstonecleaner;
 
 import java.io.BufferedReader;
 import java.io.File;

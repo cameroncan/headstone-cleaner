@@ -20,5 +20,5 @@
 			<value>.html</value>
 		</property>
 	</bean>
-	<bean id="HIService" class="com.cameronchristiansen.headstoneindexer.HIServiceImpl"/>
+	<bean id="HIService" class="com.cameronchristiansen.headstonecleaner.HIServiceImpl"/>
 </beans>

@@ -1,4 +1,4 @@
-package com.cameronchristiansen.headstoneindexer;
+package com.cameronchristiansen.headstonecleaner;
 
 public class HIResult {
 	private String id;
