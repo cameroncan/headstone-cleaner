@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+
+img.result{
+	width: 400px;
+	height: auto;
+}
+
+div.result{
+	display: inline-block;
+}
