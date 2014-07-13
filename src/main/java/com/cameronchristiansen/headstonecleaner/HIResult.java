@@ -1,15 +1,10 @@
 package com.cameronchristiansen.headstonecleaner;
 
 public class HIResult {
-	private String id;
 	private Long duration;
 	private String originalPath;
 	private String binarizedNormalPath;
 	private String binarizedInvertedPath;
-	
-	public HIResult(String id){
-		this.id = id;
-	}
 	
 	/**
 	 * @return the duration
@@ -47,13 +42,6 @@ public class HIResult {
 	public void setBinarizedInvertedPath(String binarizedInvertedPath) {
 		this.binarizedInvertedPath = binarizedInvertedPath;
 	}
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
 	/**
 	 * @return the originalPath
 	 */

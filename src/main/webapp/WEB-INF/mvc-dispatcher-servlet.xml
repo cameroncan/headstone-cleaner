@@ -20,5 +20,11 @@
 			<value>.html</value>
 		</property>
 	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="5000000"/>
+    </bean>
+    
 	<bean id="HIService" class="com.cameronchristiansen.headstonecleaner.HIServiceImpl"/>
 </beans>
