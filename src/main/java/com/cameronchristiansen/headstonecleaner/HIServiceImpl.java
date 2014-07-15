@@ -42,8 +42,10 @@ public class HIServiceImpl implements HIService {
 		
 		logger.info("Starting process for image at path: {}", fullImagePath);
 		try {
-			Date timerStart = new Date(); 
-			Process process = new ProcessBuilder("/home/cam/Applications/HeadstoneIndexer/HeadstoneIndexer", fullImagePath, destinationPath).start();
+			Date timerStart = new Date();
+			ProcessBuilder pb = new ProcessBuilder("/home/cam/Applications/HeadstoneIndexer/HeadstoneIndexer", fullImagePath, destinationPath);
+			pb.redirectErrorStream(true);
+			Process process = pb.start();
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String s = null;
 			while ((s = stdInput.readLine()) != null) {
