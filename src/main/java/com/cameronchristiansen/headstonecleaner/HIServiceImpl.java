@@ -19,31 +19,43 @@ public class HIServiceImpl implements HIService {
 
 	private static final Logger logger = LoggerFactory.getLogger(HIServiceImpl.class);
 	
-	private static final String INPUT_IMAGE_DIR = "data/input-images";
-	private static final String OUTPUT_IMAGE_DIR = "data/output-images";
+	//private static final String INPUT_IMAGE_DIR = "data/input-images";
+	//private static final String OUTPUT_IMAGE_DIR = "data/output-images";
 	
 	@Override
 	public HIResult getBinarizedImage(String imagePath) {
-		String destinationPath = OUTPUT_IMAGE_DIR;
-		String imagePathBase = INPUT_IMAGE_DIR;
+		String relativePathToInputImages = "data/input-images";
+		String fullPathToInputImages = System.getenv("pathToWebapp") + "/" + relativePathToInputImages;
+		String relativePathToOutputImages = "data/output-images";
+		String fullPathToOutputImages = System.getenv("pathToWebapp") + "/" + relativePathToOutputImages;
+		String pathToExecutable = System.getenv("HeadstoneIndexerPath");
 		
-		File image = new File(imagePathBase + "/" + imagePath);
+		logger.info("image storage path: " + fullPathToInputImages);
+		
+		File image = new File(fullPathToInputImages + "/" + imagePath);
 		if (!image.exists() || !image.isFile())
 		{
 			throw new IllegalArgumentException("The image specified does not exist or is not a file (" + image.getAbsolutePath() + ")");
 		}
 		String fullImagePath = image.getAbsolutePath();
 		
-		File destinationDir = new File(OUTPUT_IMAGE_DIR);
+		File destinationDir = new File(fullPathToOutputImages);
 		destinationDir.mkdirs();
 		
 		HIResult result = new HIResult();
-		result.setOriginalPath(image.getPath());
+		result.setOriginalPath(relativePathToInputImages + "/" + imagePath);
 		
 		logger.info("Starting process for image at path: {}", fullImagePath);
+		
+		if (null == pathToExecutable)
+		{
+			throw new RuntimeException("The executable path is not defined, please define the path in the system variable 'HeadstoneIndexerPath'");
+		}
+		logger.info("using path to executable: " + pathToExecutable);
 		try {
 			Date timerStart = new Date();
-			ProcessBuilder pb = new ProcessBuilder("/home/cam/Applications/HeadstoneIndexer/HeadstoneIndexer", fullImagePath, destinationPath);
+			logger.info("Calling executable with: " + fullImagePath + "  " + fullPathToOutputImages);
+			ProcessBuilder pb = new ProcessBuilder(pathToExecutable + "/HeadstoneIndexer", fullImagePath, fullPathToOutputImages);//fullPathToOutputImages);
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -61,28 +73,37 @@ public class HIServiceImpl implements HIService {
 		}
 		
 		String imageName = imagePath.substring(0, imagePath.lastIndexOf("."));
-		result.setBinarizedNormalPath(destinationPath + "/finalartworkRemoval_" + imageName + ".png");
-		result.setBinarizedInvertedPath(destinationPath + "/finalartworkRemoval_" + imageName + "-inverse.png");
+		result.setBinarizedNormalPath(relativePathToOutputImages + "/finalartworkRemoval_" + imageName + ".png");
+		result.setBinarizedInvertedPath(relativePathToOutputImages + "/finalartworkRemoval_" + imageName + "-inverse.png");
 		
 		return result;
 	}
 
 	@Override
 	public String storeUploadedImage(MultipartFile uploadedFile) throws IllegalStateException, IOException {
+		String pathToStoreImages = System.getenv("pathToWebapp");
+		String relativePathToInputImages = "data/input-images";
+		String inputImagePath = pathToStoreImages + "/" + relativePathToInputImages;
+		File inputImageDir = new File(inputImagePath);
+		inputImageDir.mkdirs();
+
 		String imageId = UUID.randomUUID().toString();
 
 		String originalFileName = uploadedFile.getOriginalFilename();
 		String fileExtension = originalFileName.substring(originalFileName.lastIndexOf('.'));
-		File newFile = new File(INPUT_IMAGE_DIR + "/" + imageId + fileExtension);
+		File newFile = new File(inputImagePath + "/" + imageId + fileExtension);
 	
 		uploadedFile.transferTo(newFile);
-		return newFile.getPath();
+		return relativePathToInputImages + "/" + newFile.getName();
 	}
 
 	@Override
 	public List<String> getInputImages() {
+		String relativePathToInputImages = "data/input-images";
+		String fullPathToInputImages = System.getenv("pathToWebapp") + "/" + relativePathToInputImages;
+		
 		List<String> inputImages = new ArrayList<String>();
-		File inputImagesDir = new File(INPUT_IMAGE_DIR);
+		File inputImagesDir = new File(fullPathToInputImages);
 		File[] files = inputImagesDir.listFiles(new FilenameFilter() {
 			
 			@Override
@@ -94,6 +115,12 @@ public class HIServiceImpl implements HIService {
 				return false;
 			}
 		});
+		
+		if (null == files)
+		{
+			logger.warn("There were no preloaded input images found, return an empty list");
+			return inputImages;
+		}
 		
 		for (File file : files)
 		{
