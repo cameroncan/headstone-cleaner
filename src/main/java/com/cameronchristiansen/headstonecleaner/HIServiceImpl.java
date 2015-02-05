@@ -21,13 +21,14 @@ public class HIServiceImpl implements HIService {
 	
 	//private static final String INPUT_IMAGE_DIR = "data/input-images";
 	//private static final String OUTPUT_IMAGE_DIR = "data/output-images";
+	private static final String PATH_TO_WEBAPP = "webapps/headstone-cleaner";
 	
 	@Override
 	public HIResult getBinarizedImage(String imagePath) {
 		String relativePathToInputImages = "data/input-images";
-		String fullPathToInputImages = System.getenv("pathToWebapp") + "/" + relativePathToInputImages;
+		String fullPathToInputImages = PATH_TO_WEBAPP + "/" + relativePathToInputImages;
 		String relativePathToOutputImages = "data/output-images";
-		String fullPathToOutputImages = System.getenv("pathToWebapp") + "/" + relativePathToOutputImages;
+		String fullPathToOutputImages = PATH_TO_WEBAPP + "/" + relativePathToOutputImages;
 		String pathToExecutable = System.getenv("HeadstoneIndexerPath");
 		
 		logger.info("image storage path: " + fullPathToInputImages);
@@ -81,9 +82,8 @@ public class HIServiceImpl implements HIService {
 
 	@Override
 	public String storeUploadedImage(MultipartFile uploadedFile) throws IllegalStateException, IOException {
-		String pathToStoreImages = System.getenv("pathToWebapp");
 		String relativePathToInputImages = "data/input-images";
-		String inputImagePath = pathToStoreImages + "/" + relativePathToInputImages;
+		String inputImagePath = PATH_TO_WEBAPP + "/" + relativePathToInputImages;
 		File inputImageDir = new File(inputImagePath);
 		inputImageDir.mkdirs();
 
@@ -100,14 +100,16 @@ public class HIServiceImpl implements HIService {
 	@Override
 	public List<String> getInputImages() {
 		String relativePathToInputImages = "data/input-images";
-		String fullPathToInputImages = System.getenv("pathToWebapp") + "/" + relativePathToInputImages;
+		String fullPathToInputImages = PATH_TO_WEBAPP + "/" + relativePathToInputImages;
 		
 		List<String> inputImages = new ArrayList<String>();
 		File inputImagesDir = new File(fullPathToInputImages);
+		logger.info("Using input files found at: " + inputImagesDir.getAbsolutePath());
 		File[] files = inputImagesDir.listFiles(new FilenameFilter() {
 			
 			@Override
 			public boolean accept(File dir, String name) {
+				logger.debug("Checking against dir: " + dir + ", name: " + name);
 				if (name.matches("\\d{3}\\.JPG"))
 				{
 					return true;
