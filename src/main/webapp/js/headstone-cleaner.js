@@ -79,7 +79,16 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 					scope.hasResult = true;
 			    }).
 			    error(function(data, status, headers, config) {
-			    	alert("There was an error making the request");
+			    	if (status === 429)
+			    	{
+			    		alert("You have exceeded the number of images that you can run this demo, please try again tomorrow, or contact me for further options");
+			    	}
+			    	else
+			    	{
+				    	alert("There was an error making the request");
+			    	}
+			    	scope.processing = false;
+					scope.hasResult = false;
 			    });
 			};
 			
@@ -95,7 +104,16 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 			    	document.images.original.src = data;
 			    	scope.result.inputImage = data.substr(data.lastIndexOf('/') + 1);
 				}).error(function(data, status, headers, config){
-					alert("There was an error uploading the image");
+			    	if (status === 429)
+			    	{
+			    		alert("You have exceeded the number of images that you can run this demo, please try again tomorrow, or contact me for further options");
+			    	}
+			    	else
+			    	{
+			    		alert("There was an error uploading the image");
+			    	}
+			    	scope.processing = false;
+					scope.hasResult = false;
 				});
 			};
 			
@@ -105,7 +123,7 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 					scope.availableImages = data;
 				}).
 				error(function(data, status, headers, config) {
-					alert("There was an error getting the available images");
+		    		alert("There was an error getting the available images");
 				});
 			};
 			

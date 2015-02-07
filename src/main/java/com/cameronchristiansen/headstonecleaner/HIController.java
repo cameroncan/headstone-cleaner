@@ -1,8 +1,9 @@
 package com.cameronchristiansen.headstonecleaner;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +30,48 @@ public class HIController
 		return new ResponseEntity<List<String>>(imagePaths, HttpStatus.OK);
 	}
 	@RequestMapping(value="binarize", method=RequestMethod.POST)
-	public ResponseEntity<HIResult> getBinarizedImage(@RequestBody String imagePath)
+	public ResponseEntity<HIResult> getBinarizedImage(@RequestBody String imagePath, HttpServletRequest request)
 	{
+		boolean grantAccess = false;
+		try {
+			grantAccess = hiService.trackUser(getIpAddress(request));
+		} catch (Exception e) {
+			throw new RuntimeException("There was an issue recording this visit, unable to grant access", e);
+		}
+		if (!grantAccess)
+		{
+			return new ResponseEntity<HIResult>(HttpStatus.TOO_MANY_REQUESTS);
+		}
 		HIResult hiResult = hiService.getBinarizedImage(imagePath);
 		return new ResponseEntity<HIResult>(hiResult, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="upload", method=RequestMethod.POST)
-	public ResponseEntity<String> getBinarizedImage(@RequestBody MultipartFile file) throws IllegalStateException, IOException
+	public ResponseEntity<String> getBinarizedImage(@RequestBody MultipartFile file, HttpServletRequest request) throws IllegalStateException, IOException
 	{
+		boolean grantAccess = false;
+		try {
+			grantAccess = hiService.trackUser(getIpAddress(request));
+		} catch (Exception e) {
+			throw new RuntimeException("There was an issue recording this visit, unable to grant access", e);
+		}
+		
+		if (!grantAccess)
+		{
+			return new ResponseEntity<String>(HttpStatus.TOO_MANY_REQUESTS);
+		}
 		String imagePath = hiService.storeUploadedImage(file);
 		return new ResponseEntity<String>(imagePath, HttpStatus.OK);
+	}
+	
+	private String getIpAddress(HttpServletRequest request)
+	{
+		String ipAddress = request.getHeader("X-FORWARDED-FOR");
+		if (null == ipAddress)
+		{
+			ipAddress = request.getRemoteAddr();
+		}
+		logger.info("request received from ip: " + ipAddress);
+		return ipAddress;
 	}
 }

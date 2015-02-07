@@ -2,17 +2,26 @@ package com.cameronchristiansen.headstonecleaner;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.web.multipart.MultipartFile;
 
 public class HIServiceImpl implements HIService {
@@ -22,6 +31,31 @@ public class HIServiceImpl implements HIService {
 	//private static final String INPUT_IMAGE_DIR = "data/input-images";
 	//private static final String OUTPUT_IMAGE_DIR = "data/output-images";
 	private static final String PATH_TO_WEBAPP = "webapps/headstone-cleaner";
+	private static Integer thresholdForAccess;
+	private static final int defaultThreshold = 10;
+	
+	static
+	{
+		//Get the threshold for access
+		Properties properties = new Properties();
+		InputStream istream;
+		try {
+			istream = new FileInputStream(PATH_TO_WEBAPP + "/data/tracking/tracking.properties");
+			properties.load(istream);
+			thresholdForAccess = Integer.valueOf(properties.getProperty("visitThresholdForAccess"));
+		} catch (FileNotFoundException e) {
+			logger.warn("The tracking.properties file was not found, using default value of " + defaultThreshold, e);
+		} catch (IOException e) {
+			logger.warn("There was an issue with reading the tracking.properties, using default value of " + defaultThreshold, e);
+		} catch (NumberFormatException e) {
+			logger.warn("The property \"visitThresholdForAccess\" inside the tracking.properties file cannot be coverted to an Integer, using default value of " + defaultThreshold, e);
+		} finally {
+			if (null == thresholdForAccess)
+			{
+				thresholdForAccess = defaultThreshold;
+			}
+		}
+	}
 	
 	@Override
 	public HIResult getBinarizedImage(String imagePath) {
@@ -133,4 +167,53 @@ public class HIServiceImpl implements HIService {
 		return inputImages;
 	}
 
+	@Override
+	public boolean trackUser(String ipAddress) throws IOException, ParseException {
+		DateFormatter dateFormatter = new DateFormatter("yy-MM-dd kk:mm:ss:SS");
+		
+		//Make sure the file exists
+		File trackFile = new File(PATH_TO_WEBAPP + "/data/tracking/" + ipAddress);
+		trackFile.createNewFile();
+		Date newDate = new Date();
+
+		int count = 0;
+		String fullText = "";
+		try(BufferedReader reader = new BufferedReader(new FileReader(trackFile)))
+		{
+			//Remove all +1 day old entries and count lines as we go
+			String line;
+			while (null != (line = reader.readLine()))
+			{
+				if (line.trim().isEmpty()) continue;
+				//check if date is more than a day old, if so, skip it
+				Date oldDate = dateFormatter.parse(line, new Locale("en"));
+				long diffInMillis = newDate.getTime() - oldDate.getTime();
+				if (diffInMillis <= 86400000)
+				{
+					//Add the timestamp if it has been less than a day
+					count++;
+					fullText += line + "\n";
+				}
+			}
+		}
+		
+		//Add the current vist
+		fullText += dateFormatter.print(new Date(), new Locale("en")) + "\n";
+		count++;
+		
+		try(PrintWriter printWriter = new PrintWriter(trackFile))
+		{
+			//write the entries back to the file
+			printWriter.println(fullText);
+		}
+		
+		//if there are [x] visits in the last day, revoke access
+		if (count > thresholdForAccess)
+		{
+			logger.error("Request rejected for ipaddress " + ipaddress);
+			return false;
+		}
+		
+		return true;
+	}
 }
