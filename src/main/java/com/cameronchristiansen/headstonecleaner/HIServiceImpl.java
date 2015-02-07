@@ -210,7 +210,7 @@ public class HIServiceImpl implements HIService {
 		//if there are [x] visits in the last day, revoke access
 		if (count > thresholdForAccess)
 		{
-			logger.error("Request rejected for ipaddress " + ipaddress);
+			logger.error("Request rejected for ipaddress " + ipAddress);
 			return false;
 		}
 		
