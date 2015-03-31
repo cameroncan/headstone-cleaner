@@ -14,7 +14,7 @@ public class Settings {
 	private boolean useLuminanceForGrayscale;
 	private boolean removeArtwork;
 	private boolean removeArtworkUseGraphCut;
-	private boolean ocr;
+	private boolean doOcr;
 	private boolean doOCRValidation;
 	private boolean ocrCorrectRotation;
 	private boolean checkAccuracy;
@@ -78,11 +78,11 @@ public class Settings {
 	public void setRemoveArtworkUseGraphCut(boolean removeArtworkUseGraphCut) {
 		this.removeArtworkUseGraphCut = removeArtworkUseGraphCut;
 	}
-	public boolean isOcr() {
-		return ocr;
+	public boolean isDoOcr() {
+		return doOcr;
 	}
-	public void setOcr(boolean ocr) {
-		this.ocr = ocr;
+	public void setDoOcr(boolean doOcr) {
+		this.doOcr = doOcr;
 	}
 	public boolean isDoOCRValidation() {
 		return doOCRValidation;

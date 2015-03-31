@@ -38,6 +38,7 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 								'</div>' +
 							'</div>' +
 							'<div ng-if="result.processingTime">Processing time: <span ng-bind="result.processingTime" /> seconds</div><br /><br />' +
+							'<div ng-if="result.ocr && hasResult">Transcription: <span ng-bind="result.ocr" /><br /><br /></div>' +
 						'</div>' +
 						'<div>' +
 							'<input type="radio" ng-model="inputType" value="upload">upload image</input>' +
@@ -53,6 +54,7 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 						'</div>' +
 						'<hr />' +
 						'<div>' +
+							'<input type="checkbox" id="doOcrCheckbox" name="doOcr" ng-model="doOcr" />Do OCR<br />' +
 							'<input type="button" id="submitButton" ng-click="submitPhoto()" ng-disabled="processing" value="submit" />' +
 						'</div>' +
 					'</div>' +
@@ -66,17 +68,20 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 			scope.inputType = "upload";
 			scope.showDescription = true;
 			scope.processing = false;
+			scope.doOcr = false;
 			scope.submitPhoto = function()
 			{
 				scope.processing = true;
-				$http.post('/headstone-cleaner/rest/binarize', scope.result.inputImage).
+				$http.post('/headstone-cleaner/rest/binarize?doOcr=' + scope.doOcr, scope.result.inputImage).
 			    success(function(result, status, headers, config) {
-			    	document.images.original.src = result.originalPath;
-			    	document.images.normal.src = result.binarizedNormalPath;
-			    	document.images.inverted.src = result.binarizedInvertedPath;
+			    	scope.result = result;
+			    	scope.result.inputImage = result.originalPath.substr(result.originalPath.lastIndexOf('/') + 1);
 			    	scope.result.processingTime = Math.round((result.duration * 0.001) * 1000) / 1000;
 			    	scope.processing = false;
 					scope.hasResult = true;
+					document.images.original.src = result.originalPath;
+			    	document.images.normal.src = result.binarizedNormalPath;
+			    	document.images.inverted.src = result.binarizedInvertedPath;
 			    }).
 			    error(function(data, status, headers, config) {
 			    	if (status === 429)
