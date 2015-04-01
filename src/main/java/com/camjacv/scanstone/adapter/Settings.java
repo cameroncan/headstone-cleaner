@@ -18,6 +18,7 @@ public class Settings {
 	private boolean doOCRValidation;
 	private boolean ocrCorrectRotation;
 	private boolean checkAccuracy;
+	private boolean doRegionImages;
 	public String getImageFilePath() {
 		return imageFilePath;
 	}
@@ -101,5 +102,11 @@ public class Settings {
 	}
 	public void setCheckAccuracy(boolean checkAccuracy) {
 		this.checkAccuracy = checkAccuracy;
+	}
+	public boolean isDoRegionImages() {
+		return doRegionImages;
+	}
+	public void setDoRegionImages(boolean doRegionImages) {
+		this.doRegionImages = doRegionImages;
 	}
 }

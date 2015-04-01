@@ -37,6 +37,14 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 									'<img id="inverted" class="resultImage" />' +
 								'</div>' +
 							'</div>' +
+							'<div ng-show="hasResult && doRegionImages">' +
+								'<div class="resultImage">' +
+									'<img id="regionNormal" class="resultImage" />' +
+								'</div>' +
+								'<div class="resultImage">' +
+									'<img id="regionInverted" class="resultImage" />' +
+								'</div>' +
+							'</div>' +
 							'<div ng-if="result.processingTime">Processing time: <span ng-bind="result.processingTime" /> seconds</div><br /><br />' +
 							'<div ng-if="result.ocr && hasResult">Transcription: <span ng-bind="result.ocr" /><br /><br /></div>' +
 						'</div>' +
@@ -54,7 +62,9 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 						'</div>' +
 						'<hr />' +
 						'<div>' +
+							'<input type="checkbox" id="doAutoSegment" name="doAutoSegment" ng-model="doAutoSegment" disabled />Do initial auto segmentation<br />' +
 							'<input type="checkbox" id="doOcrCheckbox" name="doOcr" ng-model="doOcr" />Do OCR<br />' +
+							'<input type="checkbox" id="doRegionImages" name="doRegionImages" ng-model="doRegionImages" />Get Text Region Images<br />' +
 							'<input type="button" id="submitButton" ng-click="submitPhoto()" ng-disabled="processing" value="submit" />' +
 						'</div>' +
 					'</div>' +
@@ -69,10 +79,12 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 			scope.showDescription = true;
 			scope.processing = false;
 			scope.doOcr = false;
+			scope.doRegionImages = false;
 			scope.submitPhoto = function()
 			{
+				scope.showDescription = false;
 				scope.processing = true;
-				$http.post('/headstone-cleaner/rest/binarize?doOcr=' + scope.doOcr, scope.result.inputImage).
+				$http.post('/headstone-cleaner/rest/binarize?doOcr=' + scope.doOcr + '&doRegionImages=' + scope.doRegionImages, scope.result.inputImage).
 			    success(function(result, status, headers, config) {
 			    	scope.result = result;
 			    	scope.result.inputImage = result.originalPath.substr(result.originalPath.lastIndexOf('/') + 1);
@@ -82,6 +94,8 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 					document.images.original.src = result.originalPath;
 			    	document.images.normal.src = result.binarizedNormalPath;
 			    	document.images.inverted.src = result.binarizedInvertedPath;
+			    	document.images.regionNormal.src = result.regionNormalPath;
+			    	document.images.regionInverted.src = result.regionInvertedPath;
 			    }).
 			    error(function(data, status, headers, config) {
 			    	if (status === 429)

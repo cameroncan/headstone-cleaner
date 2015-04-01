@@ -5,6 +5,8 @@ public class HIResult {
 	private String originalPath;
 	private String binarizedNormalPath;
 	private String binarizedInvertedPath;
+	private String regionNormalPath;
+	private String regionInvertedPath;
 	private String zonedImagePath;
 	private String ocr;
 	
@@ -68,5 +70,17 @@ public class HIResult {
 	}
 	public void setOcr(String ocr) {
 		this.ocr = ocr;
+	}
+	public String getRegionNormalPath() {
+		return regionNormalPath;
+	}
+	public void setRegionNormalPath(String regionNormalPath) {
+		this.regionNormalPath = regionNormalPath;
+	}
+	public String getRegionInvertedPath() {
+		return regionInvertedPath;
+	}
+	public void setRegionInvertedPath(String regionInvertedPath) {
+		this.regionInvertedPath = regionInvertedPath;
 	}
 }

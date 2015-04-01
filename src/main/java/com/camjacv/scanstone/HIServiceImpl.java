@@ -124,6 +124,8 @@ public class HIServiceImpl implements HIService {
 		String imageName = imagePath.substring(0, imagePath.lastIndexOf("."));
 		result.setBinarizedNormalPath(relativePathToOutputImages + "/finalartworkRemoval_" + imageName + ".png");
 		result.setBinarizedInvertedPath(relativePathToOutputImages + "/finalartworkRemoval_" + imageName + "-inverse.png");
+		result.setRegionNormalPath(relativePathToOutputImages + "/artworkRemoval-segmentationCCs_" + imageName + ".png");
+		result.setRegionInvertedPath(relativePathToOutputImages + "/artworkRemoval-segmentationCCs_" + imageName + "-inverse.png");
 		result.setZonedImagePath(relativePathToOutputImages + "/textZoning_" + imageName + ".png");
 		
 		return result;
