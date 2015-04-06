@@ -82,7 +82,6 @@ public class HIServiceImpl implements HIService {
 		
 		settings.setImageFilePath(image.getAbsolutePath());
 		settings.setResultImageFilePath(destinationDir.getAbsolutePath());
-		settings.setDoAutoSegment(false);
 		HIResult result = new HIResult();
 		result.setOriginalPath(relativePathToInputImages + "/" + imagePath);
 		

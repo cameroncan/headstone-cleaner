@@ -36,7 +36,7 @@ public class HIController
 		return new ResponseEntity<List<String>>(imagePaths, HttpStatus.OK);
 	}
 	@RequestMapping(value="binarize", method=RequestMethod.POST)
-	public ResponseEntity<HIResult> getBinarizedImage(@RequestBody String imagePath, @RequestParam boolean doOcr, @RequestParam boolean doRegionImages, HttpServletRequest request)
+	public ResponseEntity<HIResult> getBinarizedImage(@RequestBody String imagePath, @RequestParam boolean doOcr, @RequestParam boolean doRegionImages, @RequestParam boolean doAutoSegment, HttpServletRequest request)
 	{
 		boolean grantAccess = false;
 		try {
@@ -55,6 +55,7 @@ public class HIController
 		settings.setImageFilePath(imagePath);
 		settings.setDoOcr(doOcr);
 		settings.setDoRegionImages(doRegionImages);
+		settings.setDoAutoSegment(doAutoSegment);
 		HIResult hiResult = hiService.getBinarizedImage(settings);
 		return new ResponseEntity<HIResult>(hiResult, HttpStatus.OK);
 	}

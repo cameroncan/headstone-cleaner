@@ -62,7 +62,7 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 						'</div>' +
 						'<hr />' +
 						'<div>' +
-							'<input type="checkbox" id="doAutoSegment" name="doAutoSegment" ng-model="doAutoSegment" disabled />Do initial auto segmentation<br />' +
+							'<input type="checkbox" id="doAutoSegment" name="doAutoSegment" ng-model="doAutoSegment" />Do initial auto segmentation<br />' +
 							'<input type="checkbox" id="doOcrCheckbox" name="doOcr" ng-model="doOcr" />Do OCR<br />' +
 							'<input type="checkbox" id="doRegionImages" name="doRegionImages" ng-model="doRegionImages" />Get Text Region Images<br />' +
 							'<input type="button" id="submitButton" ng-click="submitPhoto()" ng-disabled="processing" value="submit" />' +
@@ -80,11 +80,12 @@ hiModule.directive('headstoneCleaner', ['$http', '$upload', function($http, $upl
 			scope.processing = false;
 			scope.doOcr = false;
 			scope.doRegionImages = false;
+			scope.doAutoSegment = false;
 			scope.submitPhoto = function()
 			{
 				scope.showDescription = false;
 				scope.processing = true;
-				$http.post('/headstone-cleaner/rest/binarize?doOcr=' + scope.doOcr + '&doRegionImages=' + scope.doRegionImages, scope.result.inputImage).
+				$http.post('/headstone-cleaner/rest/binarize?doOcr=' + scope.doOcr + '&doRegionImages=' + scope.doRegionImages + '&doAutoSegment=' + scope.doAutoSegment, scope.result.inputImage).
 			    success(function(result, status, headers, config) {
 			    	scope.result = result;
 			    	scope.result.inputImage = result.originalPath.substr(result.originalPath.lastIndexOf('/') + 1);
